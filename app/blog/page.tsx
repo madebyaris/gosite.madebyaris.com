@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Metadata } from 'next'
 import { getPosts, getAllTags } from '@/lib/wordpress'
-import type { Post, Tag } from '@/lib/types'
+import type { Post, Tag, PostsResponse } from '@/lib/types'
 import { ImageResponse } from 'next/og'
 import { Suspense } from 'react'
 import { BlogContent } from '@/components/blog-content'
@@ -13,8 +13,8 @@ export const revalidate = 3600
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Blog",
-  "name": "Web Development Insights & Tutorials",
-  "description": "Expert insights on Next.js, React, WordPress, and modern web development practices. Technical tutorials and industry best practices.",
+  "name": "Technical Insights & Development Resources",
+  "description": "In-depth articles on modern web technologies, performance optimization, and development best practices from a senior full-stack perspective.",
   "url": "https://madebyaris.com/blog",
   "author": {
     "@type": "Person",
@@ -50,8 +50,8 @@ const structuredData = {
   ],
   "about": {
     "@type": "Thing",
-    "name": "Web Development Blog",
-    "description": "Technical blog covering modern web development topics, best practices, and industry insights."
+    "name": "Technical Web Development Blog",
+    "description": "Advanced technical resources for modern web development, performance optimization, and enterprise-grade solutions."
   },
   "isPartOf": {
     "@type": "WebSite",
@@ -88,7 +88,7 @@ export async function generateMetadata(): Promise<Metadata> {
             textAlign: 'center',
           }}
         >
-          Web Development Insights
+          Technical Insights & Resources
         </h1>
         <p
           style={{
@@ -99,7 +99,7 @@ export async function generateMetadata(): Promise<Metadata> {
             maxWidth: '800px',
           }}
         >
-          Expert tutorials and insights on Next.js, React, WordPress, and modern web development
+          Advanced development strategies and solutions for modern web applications
         </p>
         <div
           style={{
@@ -127,31 +127,31 @@ export async function generateMetadata(): Promise<Metadata> {
   )
 
   return {
-    title: 'Web Development Blog | Next.js, React & WordPress Insights',
-    description: 'Expert tutorials and insights on Next.js, React, WordPress, and modern web development practices. Learn from real-world enterprise development experience.',
+    title: 'Technical Insights & Development Resources | MadeByAris',
+    description: 'Advanced development strategies and solutions for modern web applications. Practical insights from enterprise-level experience in Next.js, React, and WordPress.',
     keywords: [
-      'Web Development Blog',
-      'Next.js Tutorials',
-      'React Development',
-      'WordPress Development',
-      'TypeScript Guides',
-      'JavaScript Tips',
-      'Full Stack Development',
-      'Web Performance',
-      'Enterprise Solutions',
+      'Advanced Web Development',
+      'Next.js Architecture',
+      'React Performance',
+      'WordPress Integration',
+      'TypeScript Solutions',
+      'JavaScript Optimization',
+      'Full Stack Systems',
+      'Web Performance Tuning',
+      'Enterprise Architecture',
       'Development Best Practices'
     ],
     openGraph: {
-      title: 'Web Development Blog | Next.js, React & WordPress Insights',
-      description: 'Expert tutorials and insights on modern web development practices.',
+      title: 'Technical Insights & Development Resources | MadeByAris',
+      description: 'Advanced development strategies and solutions for modern web applications.',
       type: 'website',
       locale: 'en_US',
       images: [ogImage]
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Web Development Blog | Next.js, React & WordPress Insights',
-      description: 'Expert tutorials and insights on modern web development practices.',
+      title: 'Technical Insights & Development Resources | MadeByAris',
+      description: 'Advanced development strategies and solutions for modern web applications.',
       images: [ogImage]
     },
     alternates: {
@@ -160,18 +160,46 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function BlogPage() {
-  let posts: Post[] = []
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  let postsData: PostsResponse = { posts: [], pagination: { total: 0, totalPages: 0, currentPage: 1, perPage: 12 } }
   let popularTags: Tag[] = []
+  
+  // Await searchParams before accessing its properties
+  const resolvedSearchParams = await searchParams;
+  
+  // Extract search and page parameters safely
+  const pageParam = resolvedSearchParams.page;
+  const pageStr = typeof pageParam === 'string' 
+    ? pageParam 
+    : Array.isArray(pageParam) 
+      ? pageParam[0] 
+      : '1';
+  
+  const page = parseInt(pageStr, 10) || 1;
+  
+  const searchParam = resolvedSearchParams.search;
+  const searchStr = typeof searchParam === 'string'
+    ? searchParam
+    : Array.isArray(searchParam)
+      ? searchParam[0]
+      : '';
   
   try {
     // Fetch posts and popular tags in parallel
-    const [postsData, tagsData] = await Promise.all([
-      getPosts({ per_page: 12 }),
+    const [fetchedPostsData, tagsData] = await Promise.all([
+      getPosts({ 
+        per_page: 12, 
+        page,
+        search: searchStr
+      }),
       getAllTags(6) // Get top 6 most popular tags
     ]);
     
-    posts = postsData;
+    postsData = fetchedPostsData;
     popularTags = tagsData;
     
   } catch (error) {
@@ -188,7 +216,7 @@ export default async function BlogPage() {
         {
           "@context": "https://schema.org",
           "@type": "ItemList",
-          "itemListElement": posts.map((post, index) => ({
+          "itemListElement": postsData.posts.map((post, index) => ({
             "@type": "ListItem",
             "position": index + 1,
             "item": {
@@ -219,7 +247,7 @@ export default async function BlogPage() {
               "articleSection": post.categories?.map((cat) => typeof cat === 'object' ? cat.name : '').filter(Boolean).join(", ") || "Web Development"
             }
           })),
-          "numberOfItems": posts.length
+          "numberOfItems": postsData.posts.length
         }
       ]
     }
@@ -244,16 +272,16 @@ export default async function BlogPage() {
         <div className="container max-w-6xl mx-auto px-4 sm:px-6 relative">
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-block px-4 py-1 bg-primary/10 dark:bg-primary/20 text-primary rounded-full text-sm font-medium mb-3 backdrop-blur-sm">
-              Web Development Insights
+              Technical Resources
             </div>
             
             {/* Critical LCP element - enhanced heading */}
             <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tighter lg:text-4xl mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70">
-              Web Development Insights
+              Advanced Development Insights
             </h1>
             
             <p className="text-sm md:text-base text-muted-foreground mb-4 max-w-2xl mx-auto">
-              Expert tutorials and insights on Next.js, React, WordPress, and modern web development practices.
+              Practical solutions and strategies for building high-performance, scalable web applications with modern technologies.
             </p>
             
             <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -281,7 +309,11 @@ export default async function BlogPage() {
               ))}
             </div>
           }>
-            <BlogContent initialPosts={posts} />
+            <BlogContent 
+              initialPosts={postsData.posts} 
+              pagination={postsData.pagination}
+              initialSearch={searchStr}
+            />
           </Suspense>
         </div>
       </section>

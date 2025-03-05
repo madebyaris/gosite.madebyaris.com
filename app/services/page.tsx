@@ -1,449 +1,380 @@
+import * as React from 'react'
 import type { Metadata } from 'next'
-import { Code2, Layout, Server, Rocket, Zap, FileCode, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from '../../components/ui/button'
-import { ImageResponse } from 'next/og'
+import Image from 'next/image'
+import { 
+  ArrowRight, 
+  Zap, 
+  Server, 
+  Shield, 
+  Clock, 
+  CheckCircle2 
+} from 'lucide-react'
 
-export const revalidate = 86400 // Revalidate daily
-
-const services = [
-  {
-    title: 'Next.js Development',
-    description: 'Modern web applications built with Next.js for optimal performance, SEO, and exceptional user experience.',
-    icon: <Code2 className="w-6 h-6" />,
-    href: '/services/nextjs-development',
-    features: ['Server Components', 'Static Generation', 'Edge Runtime', 'API Routes'],
-  },
-  {
-    title: 'PHP Development',
-    description: 'Custom PHP applications and solutions built with modern practices and robust architecture.',
-    icon: <Server className="w-6 h-6" />,
-    href: '/services/php-development',
-    features: ['Custom Applications', 'API Development', 'Database Design', 'Security Focus'],
-  },
-  {
-    title: 'WordPress Development',
-    description: 'Professional WordPress development including custom themes, plugins, and headless solutions.',
-    icon: <Layout className="w-6 h-6" />,
-    href: '/services/wordpress',
-    features: ['Custom Themes', 'Plugin Development', 'Headless WordPress', 'Performance'],
-  },
-]
-
-const wordPressServices = [
-  {
-    title: 'Custom Theme Development',
-    description: 'Pixel-perfect WordPress themes that capture your unique style and meet your specific requirements.',
-    icon: <Layout className="w-6 h-6" />,
-    href: '/services/wordpress/theme-development',
-    benefits: ['Unique Design', 'Mobile-First', 'SEO Optimized', 'Fast Loading'],
-  },
-  {
-    title: 'Plugin Development',
-    description: 'Custom WordPress plugins that add exactly the features you need, built with security and performance in mind.',
-    icon: <FileCode className="w-6 h-6" />,
-    href: '/services/wordpress/plugin-development',
-    benefits: ['Custom Features', 'Integration Ready', 'Scalable', 'Well-Maintained'],
-  },
-  {
-    title: 'Headless WordPress',
-    description: 'Modern headless WordPress solutions with Next.js frontends, combining the best of both worlds.',
-    icon: <Rocket className="w-6 h-6" />,
-    href: '/services/wordpress/headless-development',
-    benefits: ['Modern Stack', 'Better Performance', 'API-Driven', 'Flexible'],
-  },
-  {
-    title: 'WordPress Optimization',
-    description: 'Comprehensive WordPress optimization for peak performance, security, and user experience.',
-    icon: <Zap className="w-6 h-6" />,
-    href: '/services/wordpress/optimization',
-    benefits: ['Speed Optimization', 'Security Hardening', 'CDN Setup', 'Caching'],
-  },
-]
-
-// Structured Data
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "@id": "https://madebyaris.com/services/#webpage",
-  "url": "https://madebyaris.com/services",
-  "name": "Professional Web Development Services | Next.js, WordPress & PHP",
-  "description": "Expert development services focused on modern technologies and best practices. From blazing-fast Next.js applications to powerful WordPress solutions.",
-  "isPartOf": {
-    "@type": "WebSite",
-    "@id": "https://madebyaris.com/#website"
-  },
-  "about": {
-    "@type": "Service",
-    "name": "Professional Web Development Services",
-    "description": "Expert development services focused on modern technologies and best practices. From blazing-fast Next.js applications to powerful WordPress solutions.",
-    "provider": {
-      "@type": "Person",
-      "name": "Aris Setiawan",
-      "jobTitle": "Senior Full-Stack Developer",
-      "url": "https://madebyaris.com"
-    },
-    "serviceType": "Web Development",
-    "areaServed": "Worldwide",
-    "offers": {
-      "@type": "AggregateOffer",
-      "offers": [
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Next.js Development",
-            "description": "Modern web applications built with Next.js for optimal performance, SEO, and exceptional user experience.",
-            "url": "https://madebyaris.com/services/nextjs-development"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "PHP Development",
-            "description": "Custom PHP applications and solutions built with modern practices and robust architecture.",
-            "url": "https://madebyaris.com/services/php-development"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "WordPress Development",
-            "description": "Professional WordPress development including custom themes, plugins, and headless solutions.",
-            "url": "https://madebyaris.com/services/wordpress"
-          }
-        }
-      ]
-    }
-  },
-  "mainEntity": {
-    "@type": "Service",
-    "name": "WordPress Development Services",
-    "description": "Comprehensive WordPress development services including custom themes, plugins, headless solutions, and optimization.",
-    "provider": {
-      "@type": "Person",
-      "name": "Aris Setiawan",
-      "url": "https://madebyaris.com"
-    },
-    "offers": {
-      "@type": "AggregateOffer",
-      "offers": [
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Custom Theme Development",
-            "description": "Pixel-perfect WordPress themes that capture your unique style and meet your specific requirements.",
-            "url": "https://madebyaris.com/services/wordpress/theme-development"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Plugin Development",
-            "description": "Custom WordPress plugins that add exactly the features you need, built with security and performance in mind.",
-            "url": "https://madebyaris.com/services/wordpress/plugin-development"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Headless WordPress",
-            "description": "Modern headless WordPress solutions with Next.js frontends, combining the best of both worlds.",
-            "url": "https://madebyaris.com/services/wordpress/headless-development"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "WordPress Optimization",
-            "description": "Comprehensive WordPress optimization for peak performance, security, and user experience.",
-            "url": "https://madebyaris.com/services/wordpress/optimization"
-          }
-        }
-      ]
-    }
-  }
-}
-
-// Generate Metadata and Structured Data
-export async function generateMetadata(): Promise<Metadata> {
-  const ogImage = new ImageResponse(
-    (
-      <div
-        style={{
-          background: 'linear-gradient(to right, #000000, #1a1a1a)',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '40px',
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '60px',
-            fontWeight: 'bold',
-            color: 'white',
-            marginBottom: '20px',
-            textAlign: 'center',
-          }}
-        >
-          Professional Web Development Services
-        </h1>
-        <p
-          style={{
-            fontSize: '30px',
-            color: '#888888',
-            marginBottom: '40px',
-            textAlign: 'center',
-            maxWidth: '800px',
-          }}
-        >
-          Next.js • WordPress • PHP • Enterprise Solutions
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            gap: '20px',
-            marginTop: '20px',
-          }}
-        >
-          <div style={{ background: '#0077B5', padding: '10px 20px', borderRadius: '20px', color: 'white' }}>
-            12+ Years Experience
-          </div>
-          <div style={{ background: '#333333', padding: '10px 20px', borderRadius: '20px', color: 'white' }}>
-            Enterprise Solutions
-          </div>
-          <div style={{ background: '#14a800', padding: '10px 20px', borderRadius: '20px', color: 'white' }}>
-            Full-Stack Development
-          </div>
-        </div>
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-    }
-  )
-
-  return {
-    title: 'Web Development Services | Next.js, WordPress & PHP',
-    description: 'Professional web development services including Next.js, WordPress, and PHP development. Expert solutions for modern web applications.',
-    keywords: [
-      'Web Development Services',
-      'Next.js Development',
-      'WordPress Development',
-      'PHP Development',
-      'Full Stack Development',
-      'Custom Web Solutions',
-      'Enterprise Development',
-      'Modern Web Apps',
-      'Web Architecture',
-      'Technical Consulting'
-    ],
-    openGraph: {
-      title: 'Web Development Services | Modern Solutions',
-      description: 'Professional web development services for modern businesses.',
-      type: 'website',
-      locale: 'en_US',
-      images: [ogImage]
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: 'Web Development Services | Modern Solutions',
-      description: 'Professional web development services for modern businesses.',
-      images: [ogImage]
-    },
-    alternates: {
-      canonical: 'https://madebyaris.com/services'
-    },
-  }
+export const metadata: Metadata = {
+  title: 'Layanan - GOSITE',
+  description: 'Layanan optimasi website WordPress untuk meningkatkan performa, kecepatan, dan keamanan website Anda.',
 }
 
 export default function ServicesPage() {
   return (
-    <>
-      <script 
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
-      <div className="relative">
-        {/* Hero Section with improved visual design */}
-        <section className="relative py-10 md:py-12 overflow-hidden">
-          <div className="container max-w-6xl mx-auto px-4 sm:px-6 relative">
-            <div className="text-center">
-              <div className="inline-block px-4 py-1 bg-primary/10 dark:bg-primary/20 text-primary rounded-full text-sm font-medium mb-4">
-                Expert Services
+    <main className="bg-white dark:bg-slate-900">
+      {/* Services Hero Section */}
+      <section className="relative pt-20 pb-16 md:pt-28 md:pb-20 overflow-hidden">
+        <div className="container-lg relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <span className="text-blue-600 dark:text-blue-400 font-medium text-sm tracking-wider uppercase mb-2 block">Layanan Kami</span>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6">
+              Solusi <span className="text-blue-600 dark:text-blue-400">WordPress</span> Terbaik
+            </h1>
+            <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+              Kami menawarkan layanan komprehensif untuk meningkatkan performa website WordPress Anda
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Cards Section */}
+      <section className="py-12 md:py-16 bg-slate-50 dark:bg-slate-800/20">
+        <div className="container-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Service 1 */}
+            <div className="group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100 dark:border-slate-700">
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors duration-300"></div>
+                <Image 
+                  src="/images/speed-up-wp.svg" 
+                  alt="Optimasi WordPress"
+                  fill
+                  className="object-cover p-6 group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
-              
-              <h1 className="text-3xl md:text-4xl font-bold leading-tight tracking-tighter lg:text-5xl mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-500">
-                Professional Web Development Services
-              </h1>
-              
-              <div className="max-w-[700px] mx-auto bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-xl border border-zinc-200/50 dark:border-zinc-700/50">
-                <p className="text-base md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
-                  Expert development services focused on modern technologies and best practices. From blazing-fast Next.js applications to powerful WordPress solutions.
+              <div className="p-6">
+                <div className="flex items-center mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mr-3">
+                    <Zap className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-lg font-bold">Speed UP WP</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                  Tingkatkan kecepatan loading website WordPress Anda untuk pengalaman pengguna yang lebih baik dan SEO yang optimal.
                 </p>
+                <Link href="/services/speed-up-wp" className="inline-flex items-center text-blue-600 dark:text-blue-400 font-medium text-sm hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                  Pelajari Lebih Lanjut
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+            
+            {/* Service 2 */}
+            <div className="group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100 dark:border-slate-700">
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors duration-300"></div>
+                <Image 
+                  src="/images/migrasi-wp.svg" 
+                  alt="Migrasi WordPress"
+                  fill
+                  className="object-cover p-6 group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mr-3">
+                    <Server className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-lg font-bold">Migrasi WP</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                  Pindahkan website WordPress Anda ke hosting baru tanpa downtime dan kehilangan data penting.
+                </p>
+                <Link href="/services/migrasi-wp" className="inline-flex items-center text-emerald-600 dark:text-emerald-400 font-medium text-sm hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+                  Pelajari Lebih Lanjut
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+            
+            {/* Service 3 */}
+            <div className="group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100 dark:border-slate-700">
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <div className="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors duration-300"></div>
+                <Image 
+                  src="/images/setup-vps.svg" 
+                  alt="Setup & Optimasi VPS"
+                  fill
+                  className="object-cover p-6 group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 mr-3">
+                    <Shield className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-lg font-bold">Setup VPS</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                  Konfigurasi server VPS Anda untuk performa optimal dengan WordPress dan keamanan tingkat tinggi.
+                </p>
+                <Link href="/services/setup-vps" className="inline-flex items-center text-amber-600 dark:text-amber-400 font-medium text-sm hover:text-amber-700 dark:hover:text-amber-300 transition-colors">
+                  Pelajari Lebih Lanjut
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+            
+            {/* Service 4 */}
+            <div className="group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100 dark:border-slate-700">
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors duration-300"></div>
+                <Image 
+                  src="/images/maintenance.svg" 
+                  alt="Maintenance VPS & WordPress"
+                  fill
+                  className="object-cover p-6 group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mr-3">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-lg font-bold">Maintenance</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                  Siap melayani perbaikan dan perawatan pada VPS dan website Anda jika terjadi issue.
+                </p>
+                <Link href="/services/maintenance" className="inline-flex items-center text-purple-600 dark:text-purple-400 font-medium text-sm hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
+                  Pelajari Lebih Lanjut
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Main Services Section */}
-        <section className="py-10 md:py-12">
-          <div className="container max-w-6xl mx-auto px-4 sm:px-6">
-            {/* Section heading with decorative elements */}
-            <div className="relative mb-8 md:mb-10 text-center">
-              <span className="inline-block px-4 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium mb-4">
-                Core Offerings
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                Main Services
-              </h2>
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-blue-500/50 rounded-full"></div>
+      {/* Services Detail Section */}
+      <section className="py-16 md:py-24">
+        <div className="container-lg">
+          {/* Speed UP WP */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+            <div className="relative rounded-2xl overflow-hidden shadow-lg aspect-[4/3] lg:aspect-auto lg:h-[500px]">
+              <Image
+                src="/images/speed-up-wp.svg"
+                alt="Speed UP WordPress Service"
+                fill
+                className="object-cover p-8"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent"></div>
             </div>
             
-            {/* Services grid with enhanced cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-              {services.map((service) => (
-                <div 
-                  key={service.title}
-                  className="group"
-                >
-                  <div className="relative h-full p-6 md:p-8 bg-white dark:bg-zinc-800/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-zinc-200/50 dark:border-zinc-700/50 overflow-hidden flex flex-col">
-                    {/* Icon */}
-                    <div className="relative mb-6 p-4 bg-blue-100 dark:bg-blue-900/30 rounded-xl w-fit">
-                      <div className="w-8 h-8 text-blue-600 dark:text-blue-400">
-                        {service.icon}
-                      </div>
-                    </div>
-                    
-                    {/* Content */}
-                    <h3 className="text-xl md:text-2xl font-bold mb-4 text-zinc-900 dark:text-white relative">
-                      {service.title}
-                    </h3>
-                    <p className="text-zinc-600 dark:text-zinc-300 mb-6 relative">
-                      {service.description}
-                    </p>
-                    
-                    {/* Features list */}
-                    <div className="mb-6 relative flex flex-wrap gap-2">
-                      {service.features.map((feature) => (
-                        <span 
-                          key={feature} 
-                          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <div className="mt-auto">
-                      <Link href={service.href}>
-                        <Button className="w-full group bg-primary hover:bg-primary/90 text-white dark:text-black rounded-full">
-                          Learn More
-                          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* WordPress Services Section */}
-        <section className="py-10 md:py-12 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950">
-          <div className="container max-w-6xl mx-auto px-4 sm:px-6">
-            {/* Section heading with decorative elements */}
-            <div className="relative mb-8 md:mb-10 text-center">
-              <span className="inline-block px-4 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-full text-sm font-medium mb-4">
-                WordPress Expertise
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                WordPress Development Services
-              </h2>
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-emerald-500/50 rounded-full"></div>
-            </div>
-            
-            {/* WordPress services grid */}
-            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-              {wordPressServices.map((service) => (
-                <div 
-                  key={service.title}
-                  className="group"
-                >
-                  <div className="relative h-full p-6 md:p-8 bg-white dark:bg-zinc-800/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-zinc-200/50 dark:border-zinc-700/50 overflow-hidden flex flex-col">
-                    {/* Icon */}
-                    <div className="relative mb-6 p-4 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl w-fit">
-                      <div className="w-8 h-8 text-emerald-600 dark:text-emerald-400">
-                        {service.icon}
-                      </div>
-                    </div>
-                    
-                    {/* Content */}
-                    <h3 className="text-xl md:text-2xl font-bold mb-4 text-zinc-900 dark:text-white relative">
-                      {service.title}
-                    </h3>
-                    <p className="text-zinc-600 dark:text-zinc-300 mb-6 relative">
-                      {service.description}
-                    </p>
-                    
-                    {/* Benefits list */}
-                    <div className="mb-6 relative flex flex-wrap gap-2">
-                      {service.benefits.map((benefit) => (
-                        <span 
-                          key={benefit} 
-                          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300"
-                        >
-                          {benefit}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <div className="mt-auto">
-                      <Link href={service.href}>
-                        <Button className="w-full group bg-emerald-600 hover:bg-emerald-700 text-white rounded-full">
-                          Learn More
-                          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-10 md:py-12">
-          <div className="container max-w-6xl mx-auto px-4 sm:px-6 relative">
-            <div className="bg-white/70 dark:bg-zinc-800/70 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-zinc-200/50 dark:border-zinc-700/50 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                Ready to Start Your Project?
-              </h2>
-              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-300 mb-6 md:mb-8 max-w-2xl mx-auto">
-                Let&apos;s collaborate to create a high-performance, visually stunning solution that meets your business needs and exceeds your expectations.
+            <div className="space-y-6">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm font-medium">
+                <span className="flex h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                Layanan Unggulan
+              </div>
+              <h2 className="text-3xl font-bold">Speed UP WordPress</h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Tingkatkan kecepatan loading website WordPress Anda untuk pengalaman pengguna yang lebih baik dan SEO yang optimal.
               </p>
-              <Link href="/contact">
-                <Button className="bg-primary hover:bg-primary/90 dark:bg-primary dark:text-black dark:hover:bg-primary/90 px-6 py-2 md:px-8 md:py-4 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-all hover:translate-y-[-2px]">
-                  Get in Touch <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-                </Button>
-              </Link>
+              
+              <div className="space-y-4 mt-6">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-blue-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Optimasi database WordPress</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-blue-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Konfigurasi caching tingkat lanjut</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-blue-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Optimasi gambar dan aset</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-blue-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Minifikasi CSS, JavaScript, dan HTML</p>
+                </div>
+              </div>
+              
+              <div className="pt-6 mt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-3xl font-bold">Rp 1.500.000</span>
+                  <span className="text-slate-500 dark:text-slate-400">/ website</span>
+                </div>
+                <Link href="/contact" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 inline-flex items-center">
+                  Konsultasi Gratis
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </div>
-        </section>
-      </div>
-    </>
+          
+          {/* Migrasi WP */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+            <div className="order-1 lg:order-2 relative rounded-2xl overflow-hidden shadow-lg aspect-[4/3] lg:aspect-auto lg:h-[500px]">
+              <Image
+                src="/images/migrasi-wp.svg"
+                alt="WordPress Migration Service"
+                fill
+                className="object-cover p-8"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 to-transparent"></div>
+            </div>
+            
+            <div className="order-2 lg:order-1 space-y-6">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
+                <span className="flex h-2 w-2 rounded-full bg-emerald-500 mr-2"></span>
+                Tanpa Downtime
+              </div>
+              <h2 className="text-3xl font-bold">Migrasi WordPress</h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Pindahkan website WordPress Anda ke hosting baru tanpa downtime dan kehilangan data penting.
+              </p>
+              
+              <div className="space-y-4 mt-6">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-emerald-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Backup lengkap website</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-emerald-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Migrasi tanpa downtime</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-emerald-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Konfigurasi server baru</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-emerald-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Pengujian menyeluruh</p>
+                </div>
+              </div>
+              
+              <div className="pt-6 mt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-3xl font-bold">Rp 1.200.000</span>
+                  <span className="text-slate-500 dark:text-slate-400">/ website</span>
+                </div>
+                <Link href="/contact" className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors duration-200 inline-flex items-center">
+                  Konsultasi Gratis
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+          
+          {/* Setup VPS */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="relative rounded-2xl overflow-hidden shadow-lg aspect-[4/3] lg:aspect-auto lg:h-[500px]">
+              <Image
+                src="/images/setup-vps.svg"
+                alt="VPS Setup Service"
+                fill
+                className="object-cover p-8"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 to-transparent"></div>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 text-amber-600 dark:text-amber-400 text-sm font-medium">
+                <span className="flex h-2 w-2 rounded-full bg-amber-500 mr-2"></span>
+                Performa Tinggi
+              </div>
+              <h2 className="text-3xl font-bold">Setup VPS</h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                Konfigurasi server VPS Anda untuk performa optimal dengan WordPress dan keamanan tingkat tinggi.
+              </p>
+              
+              <div className="space-y-4 mt-6">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-amber-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Instalasi LEMP stack (Linux, Nginx, MySQL, PHP)</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-amber-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Konfigurasi keamanan server</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-amber-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Instalasi SSL dan optimasi Nginx</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-amber-500 mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">Setup backup otomatis</p>
+                </div>
+              </div>
+              
+              <div className="pt-6 mt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-3xl font-bold">Rp 2.000.000</span>
+                  <span className="text-slate-500 dark:text-slate-400">/ server</span>
+                </div>
+                <Link href="/contact" className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors duration-200 inline-flex items-center">
+                  Konsultasi Gratis
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 md:py-20 bg-slate-50 dark:bg-slate-800/20">
+        <div className="container-lg">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg">
+            <div className="flex flex-col md:flex-row">
+              <div className="md:w-2/3 p-8 md:p-12">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">Butuh Bantuan Untuk Website Anda?</h2>
+                <p className="text-slate-600 dark:text-slate-300 mb-8 text-base md:text-lg">
+                  Konsultasikan kebutuhan website WordPress Anda dengan tim ahli kami. Kami siap memberikan solusi terbaik untuk meningkatkan performa website Anda.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Link href="/contact" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 inline-flex items-center">
+                    Hubungi Kami
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                  <Link href="https://wa.me/yourphonenumber" className="px-6 py-3 bg-white hover:bg-slate-50 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600 font-medium rounded-lg transition-colors duration-200">
+                    WhatsApp
+                  </Link>
+                </div>
+              </div>
+              <div className="md:w-1/3 bg-blue-600 dark:bg-blue-700 flex items-center justify-center p-8">
+                <div className="w-24 h-24 rounded-full bg-blue-500 dark:bg-blue-600 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 text-white">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   )
-}
+} 

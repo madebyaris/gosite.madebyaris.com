@@ -66,8 +66,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
 export async function generateStaticParams() {
   try {
-    const posts = await getPosts({ per_page: 20 });
-    return posts.map((post) => ({
+    const postsData = await getPosts({ per_page: 20 });
+    return postsData.posts.map((post) => ({
       slug: post.slug,
     }));
   } catch (error) {
@@ -161,8 +161,8 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
     }
 
     // Get related posts (for now, just get recent posts)
-    const allPosts = await getPosts({ per_page: 6 });
-    const relatedPosts = allPosts
+    const postsData = await getPosts({ per_page: 6 });
+    const relatedPosts = postsData.posts
       .filter(p => p.id !== post.id)
       .slice(0, 3);
 

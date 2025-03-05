@@ -56,6 +56,13 @@ export interface Post {
       alt_text: string
     }>
   }
+  acf?: {
+    reading_time?: string
+    featured_image?: {
+      url: string
+      alt: string
+    }
+  }
   rank_math_title?: string
   rank_math_description?: string
   rank_math_seo?: RankMathSEO
@@ -92,4 +99,17 @@ export interface PaginationParams {
   per_page?: number
   page?: number
   _fields?: string[]
+  search?: string
+}
+
+export interface PaginationData {
+  total: number
+  totalPages: number
+  currentPage: number
+  perPage: number
+}
+
+export interface PostsResponse {
+  posts: Post[]
+  pagination: PaginationData
 }

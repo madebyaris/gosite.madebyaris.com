@@ -10,6 +10,7 @@ export interface PaginationParams {
   page?: number
   per_page?: number
   _fields?: string[]
+  search?: string
 }
 export const fetchCache = 'force-no-store';
 
@@ -69,7 +70,11 @@ async function getCategoriesByIds(categoryIds: number[]): Promise<Category[]> {
   
   try {
     const categoryPromises = categoryIds.map(id => 
-      fetch(`${WP_API_URL}/wp/v2/categories/${id}`)
+      fetch(`${WP_API_URL}/wp/v2/categories/${id}`, { 
+        next: { revalidate: 3600 },
+        // Add a timeout to prevent hanging requests
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      })
         .then(res => res.ok ? res.json() : null)
         .catch(err => {
           console.error(`Failed to fetch category ${id}:`, err);
@@ -77,14 +82,17 @@ async function getCategoriesByIds(categoryIds: number[]): Promise<Category[]> {
         })
     );
     
-    const categories = await Promise.all(categoryPromises);
+    const categories = await Promise.allSettled(categoryPromises);
     return categories
-      .filter(cat => cat !== null) // Ensure we only process non-null categories
-      .map(cat => ({
-        id: cat.id,
-        name: cat.name,
-        slug: cat.slug
-      }));
+      .filter(result => result.status === 'fulfilled' && result.value !== null)
+      .map(result => {
+        const cat = (result as PromiseFulfilledResult<{id: number; name: string; slug: string}>).value;
+        return {
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug
+        };
+      });
   } catch (error) {
     console.error('Failed to fetch categories:', error);
     return [];
@@ -97,7 +105,11 @@ async function getTagsByIds(tagIds: number[]): Promise<Tag[]> {
   
   try {
     const tagPromises = tagIds.map(id => 
-      fetch(`${WP_API_URL}/wp/v2/tags/${id}`)
+      fetch(`${WP_API_URL}/wp/v2/tags/${id}`, { 
+        next: { revalidate: 3600 },
+        // Add a timeout to prevent hanging requests
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      })
         .then(res => res.ok ? res.json() : null)
         .catch(err => {
           console.error(`Failed to fetch tag ${id}:`, err);
@@ -105,13 +117,18 @@ async function getTagsByIds(tagIds: number[]): Promise<Tag[]> {
         })
     );
     
-    const tags = await Promise.all(tagPromises);
-    return tags.filter(Boolean).map(tag => ({
-      id: tag.id,
-      name: tag.name,
-      slug: tag.slug,
-      count: tag.count || 0
-    }));
+    const tags = await Promise.allSettled(tagPromises);
+    return tags
+      .filter(result => result.status === 'fulfilled' && result.value !== null)
+      .map(result => {
+        const tag = (result as PromiseFulfilledResult<{id: number; name: string; slug: string; count?: number}>).value;
+        return {
+          id: tag.id,
+          name: tag.name,
+          slug: tag.slug,
+          count: tag.count || 0
+        };
+      });
   } catch (error) {
     console.error('Failed to fetch tags:', error);
     return [];
@@ -149,7 +166,7 @@ export async function getAllTags(limit: number = 10): Promise<Tag[]> {
   }
 }
 
-export async function getPosts(params: PaginationParams = {}): Promise<Post[]> {
+export async function getPosts(params: PaginationParams = {}): Promise<{ posts: Post[]; pagination: { total: number; totalPages: number; currentPage: number; perPage: number } }> {
   try {
     const searchParams = new URLSearchParams()
     
@@ -165,6 +182,11 @@ export async function getPosts(params: PaginationParams = {}): Promise<Post[]> {
       searchParams.set('_fields', params._fields.join(','))
     }
 
+    // Add search parameter if provided
+    if (params.search) {
+      searchParams.set('search', params.search)
+    }
+
     // Ensure we get featured media in the response
     searchParams.set('_embed', 'wp:featuredmedia')
 
@@ -176,6 +198,10 @@ export async function getPosts(params: PaginationParams = {}): Promise<Post[]> {
     if (!response.ok) {
       throw new Error('Failed to fetch posts')
     }
+
+    // Extract total posts and total pages from headers
+    const totalPosts = parseInt(response.headers.get('X-WP-Total') || '0', 10)
+    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
 
     const posts = await response.json();
     
@@ -198,17 +224,27 @@ export async function getPosts(params: PaginationParams = {}): Promise<Post[]> {
       return post;
     }));
     
-    // Debug: Log the first post to check if categories are included
-    if (processedPosts.length > 0) {
-     // console.log('First processed post:', processedPosts[0]);
-      //console.log('Categories after processing:', processedPosts[0].categories);
-      //console.log('Tags after processing:', processedPosts[0].tags);
-    }
-    
-    return processedPosts;
+    // Return posts with pagination metadata
+    return {
+      posts: processedPosts,
+      pagination: {
+        total: totalPosts,
+        totalPages: totalPages,
+        currentPage: params.page || 1,
+        perPage: params.per_page || 10
+      }
+    };
   } catch (error) {
     console.error('Failed to fetch posts:', error)
-    return []
+    return {
+      posts: [],
+      pagination: {
+        total: 0,
+        totalPages: 0,
+        currentPage: params.page || 1,
+        perPage: params.per_page || 10
+      }
+    }
   }
 }
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, BookOpen, Clock, Search } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowRight, BookOpen, Clock, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import type { Post } from '@/lib/types';
+import type { Post, PaginationData } from '@/lib/types';
 
 // Helper function to format date
 function formatDate(dateString: string) {
@@ -26,34 +27,93 @@ function getReadingTime(content: string) {
   return readingTime < 1 ? 1 : readingTime;
 }
 
-interface BlogContentProps {
-  initialPosts: Post[];
+// Helper function to check if an image URL is from gosite.id
+const isGositeImage = (url: string) => {
+  return url.includes('gosite.id/wp-content');
+};
+
+// Helper function to get a fallback image URL
+const getFallbackImageUrl = () => {
+  return '/placeholder-1200-600.svg';
+};
+
+// Debounce function
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+  
+  return debouncedValue;
 }
 
-export function BlogContent({ initialPosts }: BlogContentProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+interface BlogContentProps {
+  initialPosts: Post[];
+  pagination: PaginationData;
+  initialSearch?: string;
+}
+
+export function BlogContent({ initialPosts, pagination, initialSearch = '' }: BlogContentProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [isSearching, setIsSearching] = useState(false);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>(initialPosts);
+  const [currentPagination, setCurrentPagination] = useState<PaginationData>(pagination);
   
-  // Reset filters function
-  const resetFilters = () => {
-    setSearchQuery('');
-  };
+  // Debounce search query with 200ms delay
+  const debouncedSearchQuery = useDebounce(searchQuery, 200);
   
-  // Filter posts based on search query
-  useEffect(() => {
-    let filtered = [...initialPosts];
+  // Handle search form submission
+  const handleSearch = useCallback((e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setIsSearching(true);
     
-    // Apply search filter
+    // Create new URL with search parameters
+    const params = new URLSearchParams(searchParams);
     if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      filtered = filtered.filter(post => 
-        post.title.rendered.toLowerCase().includes(searchLower) || 
-        post.excerpt.rendered.toLowerCase().includes(searchLower)
-      );
+      params.set('search', searchQuery);
+      params.delete('page'); // Reset to page 1 when searching
+    } else {
+      params.delete('search');
     }
     
-    setFilteredPosts(filtered);
-  }, [initialPosts, searchQuery]);
+    router.push(`/blog?${params.toString()}`);
+  }, [searchQuery, router, searchParams]);
+  
+  // Handle search when debounced value changes
+  useEffect(() => {
+    if (debouncedSearchQuery !== initialSearch) {
+      handleSearch();
+    }
+  }, [debouncedSearchQuery, handleSearch, initialSearch]);
+  
+  // Reset filters function
+  const resetFilters = useCallback(() => {
+    setSearchQuery('');
+    router.push('/blog');
+  }, [router]);
+  
+  // Handle pagination
+  const handlePageChange = useCallback((newPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', newPage.toString());
+    router.push(`/blog?${params.toString()}`);
+  }, [router, searchParams]);
+  
+  // Update filtered posts when initialPosts change
+  useEffect(() => {
+    setFilteredPosts(initialPosts);
+    setCurrentPagination(pagination);
+    setIsSearching(false);
+  }, [initialPosts, pagination]);
   
   // Highlight search matches in text
   const highlightSearchMatch = (text: string) => {
@@ -72,7 +132,7 @@ export function BlogContent({ initialPosts }: BlogContentProps) {
       {/* Search and Filters - simplified */}
       <div className="mb-6">
         {/* Search Bar only - full width */}
-        <div className="flex items-center justify-between gap-3 mb-3">
+        <form onSubmit={handleSearch} className="flex items-center justify-between gap-3 mb-3">
           <div className="relative w-full">
             <input 
               type="search" 
@@ -81,32 +141,41 @@ export function BlogContent({ initialPosts }: BlogContentProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {searchQuery && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+              {searchQuery && (
                 <Button 
+                  type="button"
                   variant="ghost" 
                   className="h-9 px-4 text-sm"
                   onClick={resetFilters}
                 >
                   Clear
                 </Button>
-              </div>
-            )}
+              )}
+              <Button 
+                type="submit"
+                variant="ghost" 
+                className="h-9 px-4 text-sm"
+                disabled={isSearching}
+              >
+                {isSearching ? 'Searching...' : 'Search'}
+              </Button>
+            </div>
           </div>
-        </div>
+        </form>
         
         {/* Results count */}
         {searchQuery && (
           <div className="bg-primary/5 border border-primary/10 rounded-lg p-3 mb-4">
             <div className="text-sm font-medium">
-              Found <span className="text-primary">{filteredPosts.length}</span> {filteredPosts.length === 1 ? 'article' : 'articles'} matching &quot;<span className="text-primary">{searchQuery}</span>&quot;
+              Found <span className="text-primary">{currentPagination.total}</span> {currentPagination.total === 1 ? 'article' : 'articles'} matching &quot;<span className="text-primary">{searchQuery}</span>&quot;
             </div>
           </div>
         )}
         
         {!searchQuery && (
           <div className="text-sm text-muted-foreground mb-4">
-            Showing {filteredPosts.length} {filteredPosts.length === 1 ? 'article' : 'articles'}
+            Showing {filteredPosts.length} of {currentPagination.total} {currentPagination.total === 1 ? 'article' : 'articles'}
           </div>
         )}
       </div>
@@ -134,6 +203,12 @@ export function BlogContent({ initialPosts }: BlogContentProps) {
                       quality={95}
                       placeholder="blur"
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAEtAJJXIDTjwAAAABJRU5ErkJggg=="
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (isGositeImage(target.src)) {
+                          target.src = getFallbackImageUrl();
+                        }
+                      }}
                     />
                   </div>
                 )}
@@ -201,6 +276,12 @@ export function BlogContent({ initialPosts }: BlogContentProps) {
                         quality={90}
                         placeholder="blur"
                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAEtAJJXIDTjwAAAABJRU5ErkJggg=="
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (isGositeImage(target.src)) {
+                            target.src = getFallbackImageUrl();
+                          }
+                        }}
                       />
                     </div>
                   )}
@@ -248,6 +329,73 @@ export function BlogContent({ initialPosts }: BlogContentProps) {
             </p>
             <Button onClick={resetFilters} size="sm">
               Clear Search
+            </Button>
+          </div>
+        )}
+        
+        {/* Pagination */}
+        {currentPagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPagination.currentPage - 1)}
+              disabled={currentPagination.currentPage <= 1}
+              className="flex items-center gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: currentPagination.totalPages }, (_, i) => i + 1)
+                .filter(page => 
+                  page === 1 || 
+                  page === currentPagination.totalPages || 
+                  Math.abs(page - currentPagination.currentPage) <= 1
+                )
+                .map((page, index, array) => {
+                  // Add ellipsis
+                  if (index > 0 && page - array[index - 1] > 1) {
+                    return (
+                      <div key={`ellipsis-${page}`} className="flex items-center">
+                        <span className="px-2 text-muted-foreground">...</span>
+                        <Button
+                          variant={page === currentPagination.currentPage ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handlePageChange(page)}
+                          className="w-8 h-8 p-0"
+                        >
+                          {page}
+                        </Button>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <Button
+                      key={page}
+                      variant={page === currentPagination.currentPage ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(page)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {page}
+                    </Button>
+                  );
+                })
+              }
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPagination.currentPage + 1)}
+              disabled={currentPagination.currentPage >= currentPagination.totalPages}
+              className="flex items-center gap-1"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         )}

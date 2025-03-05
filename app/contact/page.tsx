@@ -1,458 +1,231 @@
+import * as React from 'react'
 import type { Metadata } from 'next'
-import { ImageResponse } from 'next/og'
-import { Mail, MapPin, Clock, ArrowRight, Linkedin, Github, Send, MessageSquare, Users, Briefcase } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import Link from 'next/link'
-import { ContactForm } from '@/components/contact-form'
-import { techLogos } from '@/components/ui/tech-logos'
-import { LogoCarousel } from '@/components/ui/logo-carousel'
-import { Suspense } from 'react'
+import { 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Clock, 
+  HelpCircle
+} from 'lucide-react'
 
-// Structured Data
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "ContactPage",
-  "name": "Contact Aris Setiawan",
-  "description": "Get in touch with Aris Setiawan for web development projects and consultations.",
-  "url": "https://madebyaris.com/contact",
-  "mainEntity": {
-    "@type": "Organization",
-    "name": "MadeByAris",
-    "url": "https://madebyaris.com",
-    "logo": "https://madebyaris.com/logo.png",
-    "founder": {
-      "@type": "Person",
-      "name": "Aris Setiawan",
-      "jobTitle": "Senior Full Stack Developer",
-      "url": "https://madebyaris.com"
-    },
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer service",
-      "email": "arissetia.m@gmail.com",
-      "availableLanguage": ["English", "Indonesian"],
-      "areaServed": "Worldwide",
-      "hoursAvailable": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday"
-        ],
-        "opens": "09:00",
-        "closes": "17:00"
-      }
-    },
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Sidoarjo",
-      "addressCountry": "Indonesia"
-    },
-    "sameAs": [
-      "https://www.linkedin.com/in/arissetia/",
-      "https://github.com/madebyaris",
-      "https://www.upwork.com/freelancers/~0117c4a4c888d9e9fe"
-    ],
-    "makesOffer": [
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Enterprise Web Applications",
-          "description": "Scalable solutions with modern tech stack and robust architecture"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "E-commerce Solutions",
-          "description": "Custom online stores with seamless user experience and secure transactions"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Technical Consultation",
-          "description": "Expert advice on architecture, performance optimization, and best practices"
-        }
-      }
-    ]
-  }
-}
-
-// Generate OG Image
-export async function generateMetadata(): Promise<Metadata> {
-  const ogImage = new ImageResponse(
-    (
-      <div
-        style={{
-          background: 'linear-gradient(to right, #000000, #1a1a1a)',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '40px',
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '60px',
-            fontWeight: 'bold',
-            color: 'white',
-            marginBottom: '20px',
-            textAlign: 'center',
-          }}
-        >
-          Let&apos;s Build Something Amazing
-        </h1>
-        <p
-          style={{
-            fontSize: '30px',
-            color: '#888888',
-            marginBottom: '40px',
-            textAlign: 'center',
-            maxWidth: '800px',
-          }}
-        >
-          Enterprise Web Development Solutions & Technical Consultations
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            gap: '20px',
-            marginTop: '20px',
-          }}
-        >
-          <div style={{ background: '#0077B5', padding: '10px 20px', borderRadius: '20px', color: 'white' }}>
-            LinkedIn
-          </div>
-          <div style={{ background: '#333333', padding: '10px 20px', borderRadius: '20px', color: 'white' }}>
-            GitHub
-          </div>
-          <div style={{ background: '#14a800', padding: '10px 20px', borderRadius: '20px', color: 'white' }}>
-            Upwork
-          </div>
-        </div>
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-    }
-  )
-
-  return {
-    title: 'Contact Aris Setiawan | Enterprise Web Development Solutions',
-    description: 'Get in touch for enterprise-level web development solutions, technical consultations, or project collaborations. Specializing in Next.js, React, and WordPress.',
-    keywords: [
-      'Contact Developer',
-      'Hire Web Developer',
-      'Enterprise Solutions',
-      'Technical Consultation',
-      'Next.js Development',
-      'React Development',
-      'WordPress Development',
-      'Full Stack Developer',
-      'Web Architecture',
-      'Project Collaboration'
-    ],
-    openGraph: {
-      title: 'Contact Aris Setiawan | Enterprise Web Development',
-      description: 'Let\'s collaborate on your next web development project.',
-      type: 'website',
-      locale: 'en_US',
-      images: [ogImage]
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: 'Contact Aris Setiawan | Enterprise Web Development',
-      description: 'Let\'s collaborate on your next web development project.',
-      images: [ogImage]
-    },
-    alternates: {
-      canonical: 'https://madebyaris.com/contact'
-    }
-  }
+export const metadata: Metadata = {
+  title: 'Contact Us - Made by Aris',
+  description: 'Get in touch with our WordPress experts for free consultation and website optimization solutions.',
 }
 
 export default function ContactPage() {
-  // Function to generate structured data
-  function generateStructuredData() {
-    return {
-      __html: JSON.stringify(structuredData)
-    }
-  }
-
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={generateStructuredData()}
-      />
-      
-      {/* Hero Section - Simplified for better LCP */}
-      <section className="relative py-12 md:py-16 overflow-hidden">
-        {/* Static background with reduced complexity */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.05),transparent_60%)]"></div>
-        
-        <div className="container max-w-6xl mx-auto px-4 sm:px-6 relative">
-          <div className="text-center">
-            <div className="inline-block px-4 py-1 bg-primary/10 dark:bg-primary/20 text-primary rounded-full text-sm font-medium mb-4">
-              Get in Touch
-            </div>
-            
-            {/* Critical LCP element - simplified and without Sparkles initially */}
-            <h1 className="text-3xl md:text-4xl font-bold leading-tight tracking-tighter lg:text-5xl mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-500">
-              Let&apos;s Build Something Amazing
+    <main className="bg-white dark:bg-slate-900">
+      {/* Contact Hero Section */}
+      <section className="relative pt-24 pb-16 md:pt-32 md:pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_70%)]"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-80 bg-gradient-to-b from-transparent to-white dark:to-slate-900 opacity-30"></div>
+        <div className="container-lg relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium text-sm tracking-wider uppercase mb-4">Get In Touch</div>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6">
+              Let&apos;s <span className="text-blue-600 dark:text-blue-400">Connect</span>
             </h1>
-            
-            <div className="max-w-[700px] mx-auto bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-xl border border-zinc-200/50 dark:border-zinc-700/50">
-              <p className="text-base md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
-                Enterprise-level solutions & technical consultation 
-                to help turn your vision into reality.
-              </p>
-            </div>
-          </div>
-        </div>  
-      </section>
-
-      <main className="container max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-        {/* Two-column layout for form and contact info */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 mb-12 md:mb-16">
-          {/* Contact Form - Left Column (3/5) */}
-          <div className="lg:col-span-3">
-            <Card className="overflow-hidden border border-zinc-200/80 dark:border-zinc-700/80 shadow-xl">
-              <div className="bg-gradient-to-r from-primary/10 to-emerald-500/10 p-4 md:p-6 border-b border-zinc-200/80 dark:border-zinc-700/80">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/20 rounded-full">
-                    <MessageSquare className="h-5 w-5 text-primary" />
-                  </div>
-                  <h2 className="text-lg md:text-xl font-semibold">Send Me a Message</h2>
-                </div>
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                  Fill out the form below and I&apos;ll get back to you within 24 hours.
-                </p>
-              </div>
-              <div className="p-4 md:p-6 bg-white dark:bg-zinc-900">
-                <ContactForm />
-              </div>
-            </Card>
-          </div>
-          
-          {/* Contact Info - Right Column (2/5) */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Contact Info Cards */}
-            <Card className="overflow-hidden border border-zinc-200/80 dark:border-zinc-700/80 shadow-lg">
-              <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 p-4 border-b border-zinc-200/80 dark:border-zinc-700/80">
-                <h2 className="font-semibold flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Contact Information
-                </h2>
-              </div>
-              <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                <div className="p-4 flex items-start gap-4">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full shrink-0">
-                    <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm text-zinc-500 dark:text-zinc-400">Email</h3>
-                    <Link 
-                      href="mailto:arissetia.m@gmail.com" 
-                      className="text-zinc-900 dark:text-zinc-100 hover:text-primary dark:hover:text-primary transition-colors"
-                    >
-                      arissetia.m@gmail.com
-                    </Link>
-                  </div>
-                </div>
-                
-                <div className="p-4 flex items-start gap-4">
-                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-full shrink-0">
-                    <MapPin className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm text-zinc-500 dark:text-zinc-400">Location</h3>
-                    <p className="text-zinc-900 dark:text-zinc-100">Sidoarjo, Indonesia</p>
-                  </div>
-                </div>
-                
-                <div className="p-4 flex items-start gap-4">
-                  <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full shrink-0">
-                    <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm text-zinc-500 dark:text-zinc-400">Availability</h3>
-                    <p className="text-zinc-900 dark:text-zinc-100">Mon - Sat, 9:00 - 17:00 WIB</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-            
-            {/* Professional Profiles */}
-            <Card className="overflow-hidden border border-zinc-200/80 dark:border-zinc-700/80 shadow-lg">
-              <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 p-4 border-b border-zinc-200/80 dark:border-zinc-700/80">
-                <h2 className="font-semibold flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Professional Profiles
-                </h2>
-              </div>
-              <div className="p-4 flex flex-wrap gap-3">
-                <Link href="https://www.linkedin.com/in/arissetia/" target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" className="bg-[#0077B5] hover:bg-[#0077B5]/90 text-white">
-                    <Linkedin className="mr-2 h-4 w-4" />
-                    LinkedIn
-                  </Button>
-                </Link>
-                <Link href="https://github.com/madebyaris" target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" variant="outline" className="border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                    <Github className="mr-2 h-4 w-4" />
-                    GitHub
-                  </Button>
-                </Link>
-                <Link href="https://www.upwork.com/freelancers/~0117c4a4c888d9e9fe" target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" className="bg-[#14a800] hover:bg-[#14a800]/90 text-white">
-                    <ArrowRight className="mr-2 h-4 w-4" />
-                    Upwork
-                  </Button>
-                </Link>
-              </div>
-            </Card>
-            
-            {/* Quick Response Card */}
-            <Card className="bg-gradient-to-br from-primary/5 to-emerald-500/5 border border-zinc-200/80 dark:border-zinc-700/80 p-6 shadow-lg">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Send className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-semibold">Quick Response</h3>
-              </div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-                I typically respond to all inquiries within 24 hours. For urgent matters, please mention it in your message.
-              </p>
-            </Card>
+            <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+              Have questions about our WordPress services? Need a custom solution? Our team is ready to help you achieve your website goals.
+            </p>
           </div>
         </div>
-        
-        {/* Services Section - Lazy loaded */}
-        <Suspense fallback={<div className="h-[300px] animate-pulse bg-zinc-100/20 dark:bg-zinc-800/20 rounded-xl mb-16"></div>}>
-          <section className="mb-16">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold relative inline-block">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                  Services I Offer
-                </span>
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-primary/50 rounded-full"></div>
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="group p-6 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden">
-                {/* Card decoration */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100/50 dark:bg-blue-900/20 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                
-                <div className="relative">
-                  <div className="mb-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl w-fit">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Enterprise Web Applications</h3>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">
-                    Scalable solutions with modern tech stack and robust architecture for businesses of all sizes.
-                  </p>
-                </div>
-              </Card>
-              
-              <Card className="group p-6 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden">
-                {/* Card decoration */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/50 dark:bg-emerald-900/20 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                
-                <div className="relative">
-                  <div className="mb-4 p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl w-fit">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">E-commerce Solutions</h3>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">
-                    Custom online stores with seamless user experience and secure transactions for maximum conversion.
-                  </p>
-                </div>
-              </Card>
-              
-              <Card className="group p-6 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden">
-                {/* Card decoration */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-100/50 dark:bg-purple-900/20 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                
-                <div className="relative">
-                  <div className="mb-4 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl w-fit">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Technical Consultation</h3>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">
-                    Expert advice on architecture, performance optimization, and best practices for your development team.
-                  </p>
-                </div>
-              </Card>
-            </div>
-          </section>
-        </Suspense>
-        
-        {/* Trusted By Section - Lazy loaded */}
-        <Suspense fallback={<div className="h-[200px] animate-pulse bg-zinc-100/20 dark:bg-zinc-800/20 rounded-xl mb-16"></div>}>
-          <section className="mb-16">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold relative inline-block">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                  Trusted By
-                </span>
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-primary/50 rounded-full"></div>
-              </h2>
-            </div>
-            
-            <Card className="p-8 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-700/80 shadow-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-100/80 to-transparent dark:via-zinc-900/10 backdrop-blur-xl" />
-             
-              <div className="relative">
-                <LogoCarousel 
-                  columnCount={3}
-                  logos={techLogos}
-                />
-              </div>
-            </Card>
-          </section>
-        </Suspense>
-        
-        {/* CTA Section - Lazy loaded */}
-        <Suspense fallback={<div className="h-[200px] animate-pulse bg-zinc-100/20 dark:bg-zinc-800/20 rounded-xl"></div>}>
-          <section>
-            <Card className="p-8 bg-gradient-to-br from-primary/5 via-primary/10 to-emerald-500/5 border border-zinc-200/80 dark:border-zinc-700/80 shadow-xl relative overflow-hidden">
-              
-              <div className="relative text-center max-w-2xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                  Ready to Start Your Project?
-                </h2>
-                <p className="text-zinc-600 dark:text-zinc-400 mb-8">
-                  Fill out the contact form above or send me an email directly. I&apos;ll get back to you within 24 hours to discuss how we can work together to bring your vision to life.
+      </section>
+
+      {/* Contact Information Section - Modified to take full width */}
+      <section className="py-16 md:py-20">
+        <div className="container-lg">
+          <div className="max-w-3xl mx-auto">
+            {/* Contact Info */}
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+                <p className="text-slate-600 dark:text-slate-300 mb-8">
+                  We&apos;re ready to help with your WordPress optimization needs. Reach out through any of the contact methods below.
                 </p>
-                <Link href="mailto:arissetia.m@gmail.com">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white dark:text-black dark:hover:bg-primary/90 px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all hover:translate-y-[-2px]">
-                    Send Email <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
               </div>
-            </Card>
-          </section>
-        </Suspense>
-      </main>
-    </>
+
+              <div className="space-y-6">
+                <div className="flex items-start gap-4 p-4 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-1">Phone</h3>
+                    <p className="text-slate-600 dark:text-slate-300">+62 812 3456 7890</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Available Mon-Fri, 9am-5pm</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 p-4 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-1">Email</h3>
+                    <p className="text-slate-600 dark:text-slate-300">hello@madebyaris.com</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">We respond within 24 hours</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 p-4 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-1">Address</h3>
+                    <p className="text-slate-600 dark:text-slate-300">
+                      Jl. Raya Utama No. 123<br />
+                      Jakarta Selatan, 12345<br />
+                      Indonesia
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-start gap-4 p-4 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Business Hours</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Monday - Friday:</span>
+                        <span className="font-medium">09:00 - 17:00 WIB</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Saturday:</span>
+                        <span className="font-medium">09:00 - 15:00 WIB</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Sunday:</span>
+                        <span className="font-medium">Closed</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Map Section */}
+      <section className="py-16 md:py-20 bg-slate-50 dark:bg-slate-800/20">
+        <div className="container-lg">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Find Us</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-300">
+              Visit our office for an in-person consultation
+            </p>
+          </div>
+          <div className="rounded-2xl overflow-hidden shadow-lg h-[400px] relative">
+            <div className="absolute inset-0 bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+              <div className="text-center p-8">
+                <MapPin className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+                <p className="text-lg font-medium">Google Maps will be displayed here</p>
+                <p className="text-slate-500 dark:text-slate-400">Jl. Raya Utama No. 123, Jakarta Selatan</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 md:py-24">
+        <div className="container-lg">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium text-sm tracking-wider uppercase mb-4">FAQ</div>
+            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-300">
+              Here are some common questions our clients ask
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium mb-2">How long does WordPress optimization take?</h3>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    The time required for WordPress optimization varies depending on the complexity of your website and the issues that need to be fixed. Generally, basic optimization can be completed within 2-3 business days.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium mb-2">Does maintenance include plugin and theme updates?</h3>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    Yes, our maintenance services include regular plugin and theme updates, website backups, security monitoring, and performance optimization to ensure your website runs optimally at all times.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium mb-2">Do you offer emergency WordPress support?</h3>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    Yes, we offer emergency WordPress support for critical issues. Our priority support ensures that urgent problems are addressed promptly, minimizing downtime and potential business impact.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:shadow-md">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium mb-2">Can you help with custom WordPress development?</h3>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    Absolutely! We specialize in custom WordPress development, including theme customization, plugin development, and creating unique features tailored to your specific business needs.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 md:py-20 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800/50 dark:to-blue-900/20">
+        <div className="container-lg">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-4">Ready to Optimize Your WordPress Site?</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
+              Get in touch today for a free consultation and let&apos;s discuss how we can help improve your website&apos;s performance.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="#" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors">
+                Schedule a Call
+                <Phone className="ml-2 h-4 w-4" />
+              </a>
+              <a href="mailto:hello@madebyaris.com" className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 font-medium transition-colors">
+                Email Us
+                <Mail className="ml-2 h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   )
-}
+} 

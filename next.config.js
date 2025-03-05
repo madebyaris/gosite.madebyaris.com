@@ -6,7 +6,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'wp.madebyaris.com',
+        hostname: 'gosite.id',
         port: '',
         pathname: '/**',
       },

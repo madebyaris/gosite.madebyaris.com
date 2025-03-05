@@ -3,40 +3,29 @@
 
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { motion } from "framer-motion"
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center justify-center">
-        <div className="flex w-full max-w-[980px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Left section with Navigation */}
-          <div className="md:hidden">
-            <Navigation />
-          </div>
+    <motion.header 
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+      className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/70 supports-[backdrop-filter]:bg-background/40 border-b border-slate-200/20 dark:border-slate-700/20 shadow-sm"
+    >
+      <div className="container-lg flex h-18 items-center justify-between py-4">
+        {/* Logo */}
+        <Link href="/" className="relative group">
+          <span className="flex items-center">
+            <span className="text-primary font-bold text-2xl tracking-tight">GO</span>
+            <span className="font-bold text-2xl tracking-tight">SITE</span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
+          </span>
+        </Link>
 
-          {/* Center Logo */}
-          <div className="flex-1 flex justify-center md:flex-none">
-            <Link href="/" className="font-bold text-lg">
-              MadeByAris
-            </Link>
-          </div>
-
-          {/* Desktop Navigation and Theme Toggle */}
-          <div className="flex items-center gap-4">
-            <div className="hidden md:block">
-              <Navigation />
-            </div>
-            <Link
-              href="https://www.upwork.com/freelancers/~0117c4a4c888d9e9fe"
-              className="hidden md:block text-sm font-medium hover:text-foreground/80"
-            >
-              Hire Me
-            </Link>
-            <ThemeToggle />
-          </div>
-        </div>
+        {/* Navigation */}
+        <Navigation />
       </div>
-    </header>
+    </motion.header>
   )
 }

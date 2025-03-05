@@ -1,0 +1,5 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#000000"/>
+  <path d="M41.5 110.5L71.5 142.5L128.5 57.5" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="100" y="180" font-family="Arial" font-size="16" text-anchor="middle" fill="white">Next.js Performance</text>
+</svg> 

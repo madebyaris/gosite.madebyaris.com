@@ -6,10 +6,40 @@ import { Button } from '@/components/ui/button'
 import { ArrowRight, Filter, Search, Briefcase, ShoppingCart, Film, Home, Globe } from 'lucide-react'
 import { Sparkles } from '@/components/ui/sparkles'
 import dynamic from 'next/dynamic'
-import { projects } from '@/app/projects/server-page'
 
 // Import ProjectCard as a client component
 const ProjectCard = dynamic(() => import('@/components/project-card'), { ssr: true })
+
+// Sample projects data
+const projects = [
+  {
+    id: 1,
+    title: "E-Learning Platform",
+    description: "A comprehensive learning management system with interactive courses, quizzes, and progress tracking.",
+    logo: "/images/projects/project1.png",
+    tags: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    link: "https://example.com/project1",
+    category: "Education"
+  },
+  {
+    id: 2,
+    title: "Digital Marketing Agency",
+    description: "A modern website for a digital marketing agency showcasing their services and portfolio.",
+    logo: "/images/projects/project2.png",
+    tags: ["WordPress", "PHP", "JavaScript", "SCSS"],
+    link: "https://example.com/project2",
+    category: "Agency"
+  },
+  {
+    id: 3,
+    title: "Property Listing Platform",
+    description: "A real estate platform with advanced search, filtering, and property management features.",
+    logo: "/images/projects/project3.png",
+    tags: ["React", "Node.js", "MongoDB", "Express"],
+    link: "https://example.com/project3",
+    category: "Real Estate"
+  }
+];
 
 // Define category colors with improved icons
 const categoryColors: Record<string, { bg: string, text: string, icon: React.ReactNode, hoverBg: string }> = {
