@@ -14,7 +14,11 @@ import type { Category } from '@/lib/types'
 import { TableOfContents } from '@/components/table-of-contents'
 import { SmoothScroll } from '@/components/smooth-scroll'
 
-export const revalidate = 3600 // Revalidate every hour
+// Increase revalidation time to 48 hours (172800 seconds)
+export const revalidate = 172800
+
+// Cache the blog post page for better performance
+export const fetchCache = 'force-cache'
 
 interface BlogPostPageProps {
   params: Promise<{

@@ -1,7 +1,7 @@
 # 🚀 MadeByAris.com - Modern Portfolio & Blog Platform
 
 <div align="center">
-  <img src="public/logo.png" alt="MadeByAris Logo" width="180" />
+  <img src="public/images/aris-setiawan.jpg" alt="MadeByAris Logo" width="180" />
   <p><em>A high-performance, SEO-optimized portfolio and blog platform built with Next.js 15</em></p>
   
   [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
@@ -15,9 +15,9 @@
 
 MadeByAris.com is a modern, high-performance portfolio and blog platform designed for developers, designers, and creative professionals. It combines the power of Next.js 15 with WordPress as a headless CMS, delivering lightning-fast performance, stunning visuals, and exceptional SEO capabilities.
 
-### 🌟 [Live Demo](https://madebyaris.com)
+### 🌟 [Live Demo](https://gosite-madebyaris-com.vercel.app/)
 
-![Website Preview](public/preview.png)
+![Website Preview](public/images/result-gosite-vercel.png)
 
 ## 📋 Table of Contents
 

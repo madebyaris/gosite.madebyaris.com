@@ -6,16 +6,35 @@ if (!WP_API_URL) {
   throw new Error('NEXT_PUBLIC_WP_API_URL is not defined')
 }
 
+// Extend the Post type to include _embedded fields
+interface PostWithEmbedded extends Post {
+  _embedded?: {
+    'wp:featuredmedia'?: { source_url: string; alt_text: string }[];
+    'wp:term'?: Array<Array<Category | Tag>>;
+    author?: Array<{ name: string; link: string }>;
+  };
+}
+
 export interface PaginationParams {
   page?: number
   per_page?: number
   _fields?: string[]
   search?: string
 }
-export const fetchCache = 'force-no-store';
 
+// Cache configuration
+const CACHE_TIMES = {
+  POSTS: 86400, // 24 hours
+  SINGLE_POST: 172800, // 48 hours
+  TAGS: 604800, // 7 days
+  CATEGORIES: 604800, // 7 days
+  PROJECTS: 604800, // 7 days
+}
 
-async function fetchAPI<T>(endpoint: string, params: Record<string, string | number> = {}): Promise<T> {
+async function fetchAPI<T>(endpoint: string, params: Record<string, string | number> = {}, options: { 
+  revalidate?: number | false, 
+  tags?: string[] 
+} = {}): Promise<T> {
   try {
     const queryString = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
@@ -23,12 +42,30 @@ async function fetchAPI<T>(endpoint: string, params: Record<string, string | num
     })
 
     const url = `${WP_API_URL}/wp/v2/${endpoint}/${queryString.toString() ? `?${queryString}` : ''}`
-    console.log('Fetching URL:', url) // Debug log
-
+    
+    // Determine the endpoint type for default cache settings
+    const endpointType = endpoint.includes('posts') 
+      ? endpoint.includes('?slug=') ? 'SINGLE_POST' : 'POSTS'
+      : endpoint.includes('tags') 
+        ? 'TAGS' 
+        : endpoint.includes('categories') 
+          ? 'CATEGORIES' 
+          : endpoint.includes('projects') 
+            ? 'PROJECTS' 
+            : 'POSTS';
+    
+    // Set default cache tags based on endpoint
+    const defaultTags = [`wp-${endpoint.split('?')[0]}`];
+    
+    // Fetch with appropriate caching options
     const response = await fetch(url, { 
       next: { 
-        revalidate: 3600, // Set to a positive value for revalidation
-        tags: [`wp-${endpoint}`], // Add cache tags for targeted revalidation
+        // Use provided revalidate value, or default based on endpoint type, or false to force cache
+        revalidate: options.revalidate !== undefined 
+          ? options.revalidate 
+          : CACHE_TIMES[endpointType],
+        // Combine default tags with any provided tags
+        tags: options.tags ? [...defaultTags, ...options.tags] : defaultTags,
       },
       headers: {
         'Accept': 'application/json',
@@ -51,21 +88,37 @@ async function fetchAPI<T>(endpoint: string, params: Record<string, string | num
 
 export async function getPost(slug: string): Promise<Post | null> {
   try {
-    const posts = await fetchAPI<Post[]>('posts', {
+    const posts = await fetchAPI<PostWithEmbedded[]>('posts', { 
       slug,
-      _embed: 'wp:featuredmedia,wp:term',
-      per_page: 1
-    })
+      _embed: 'wp:featuredmedia,author,wp:term'
+    }, {
+      revalidate: CACHE_TIMES.SINGLE_POST,
+      tags: [`post-${slug}`]
+    });
 
-    return posts[0] || null
+    if (!posts.length) {
+      return null;
+    }
+
+    const post = posts[0];
+    
+    // Process categories and tags if available
+    if (post._embedded && post._embedded['wp:term']) {
+      const terms = post._embedded['wp:term'];
+      // Cast the terms to the correct types
+      post.categories = (terms[0] || []) as Category[];
+      post.tags = (terms[1] || []) as Tag[];
+    }
+
+    return post;
   } catch (error) {
-    console.error('Failed to fetch post:', error)
-    return null
+    console.error(`Failed to fetch post with slug ${slug}:`, error);
+    return null;
   }
 }
 
 // Function to fetch categories by IDs
-async function getCategoriesByIds(categoryIds: number[]): Promise<Category[]> {
+export async function getCategoriesByIds(categoryIds: number[]): Promise<Category[]> {
   if (!categoryIds || categoryIds.length === 0) return [];
   
   try {
@@ -100,7 +153,7 @@ async function getCategoriesByIds(categoryIds: number[]): Promise<Category[]> {
 }
 
 // Function to fetch tags by IDs
-async function getTagsByIds(tagIds: number[]): Promise<Tag[]> {
+export async function getTagsByIds(tagIds: number[]): Promise<Tag[]> {
   if (!tagIds || tagIds.length === 0) return [];
   
   try {
@@ -138,21 +191,13 @@ async function getTagsByIds(tagIds: number[]): Promise<Tag[]> {
 // Function to get all tags sorted by popularity (count)
 export async function getAllTags(limit: number = 10): Promise<Tag[]> {
   try {
-    const searchParams = new URLSearchParams();
-    searchParams.set('orderby', 'count');
-    searchParams.set('order', 'desc');
-    searchParams.set('per_page', limit.toString());
-    
-    const response = await fetch(
-      `${WP_API_URL}/wp/v2/tags?${searchParams.toString()}`,
-      { next: { revalidate: 3600 } }
-    );
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch tags');
-    }
-    
-    const tags = await response.json();
+    const tags = await fetchAPI<Tag[]>('tags', {
+      orderby: 'count',
+      order: 'desc',
+      per_page: limit
+    }, {
+      revalidate: CACHE_TIMES.TAGS
+    });
     
     return tags.map((tag: { id: number; name: string; slug: string; count?: number }) => ({
       id: tag.id,
@@ -168,83 +213,82 @@ export async function getAllTags(limit: number = 10): Promise<Tag[]> {
 
 export async function getPosts(params: PaginationParams = {}): Promise<{ posts: Post[]; pagination: { total: number; totalPages: number; currentPage: number; perPage: number } }> {
   try {
-    const searchParams = new URLSearchParams()
+    const apiParams: Record<string, string | number> = {};
     
     if (params.per_page) {
-      searchParams.set('per_page', params.per_page.toString())
+      apiParams.per_page = params.per_page;
     }
     
     if (params.page) {
-      searchParams.set('page', params.page.toString())
+      apiParams.page = params.page;
     }
 
     if (params._fields) {
-      searchParams.set('_fields', params._fields.join(','))
+      apiParams._fields = params._fields.join(',');
     }
 
     // Add search parameter if provided
     if (params.search) {
-      searchParams.set('search', params.search)
+      apiParams.search = params.search;
     }
 
     // Ensure we get featured media in the response
-    searchParams.set('_embed', 'wp:featuredmedia')
+    apiParams._embed = 'wp:featuredmedia';
 
-    const response = await fetch(
-      `${WP_API_URL}/wp/v2/posts?${searchParams.toString()}`,
-      { next: { revalidate: 3600 } }
-    )
+    // Determine cache settings based on whether this is a search or not
+    const cacheOptions = {
+      revalidate: params.search ? 1800 : CACHE_TIMES.POSTS, // Shorter cache for search results
+      tags: params.search ? [`wp-posts-search-${params.search}`] : ['wp-posts']
+    };
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch posts')
+    // Use our fetchAPI function with custom fetch to get headers
+    const fetchResponse = await fetch(
+      `${WP_API_URL}/wp/v2/posts?${new URLSearchParams(
+        Object.entries(apiParams).map(([key, value]) => [key, String(value)])
+      ).toString()}`,
+      { 
+        next: { 
+          revalidate: cacheOptions.revalidate,
+          tags: cacheOptions.tags
+        }
+      }
+    );
+
+    if (!fetchResponse.ok) {
+      throw new Error('Failed to fetch posts');
     }
 
     // Extract total posts and total pages from headers
-    const totalPosts = parseInt(response.headers.get('X-WP-Total') || '0', 10)
-    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
+    const totalPosts = parseInt(fetchResponse.headers.get('X-WP-Total') || '0', 10);
+    const totalPages = parseInt(fetchResponse.headers.get('X-WP-TotalPages') || '0', 10);
 
-    const posts = await response.json();
-    
-    // Process posts to fetch and add full category and tag objects
-    const processedPosts = await Promise.all(posts.map(async (post: Post) => {
-      // Fetch full category objects if we have category IDs
-      if (post.categories && Array.isArray(post.categories) && post.categories.length > 0) {
-        post.categories = await getCategoriesByIds(post.categories as unknown as number[]);
-      } else {
-        post.categories = [];
-      }
-      
-      // Fetch full tag objects if we have tag IDs
-      if (post.tags && Array.isArray(post.tags) && post.tags.length > 0) {
-        post.tags = await getTagsByIds(post.tags as unknown as number[]);
-      } else {
-        post.tags = [];
-      }
-      
-      return post;
-    }));
-    
-    // Return posts with pagination metadata
+    // Get the posts data
+    const posts = await fetchResponse.json();
+
+    // Calculate pagination data
+    const currentPage = params.page || 1;
+    const perPage = params.per_page || 10;
+
     return {
-      posts: processedPosts,
+      posts,
       pagination: {
         total: totalPosts,
-        totalPages: totalPages,
-        currentPage: params.page || 1,
-        perPage: params.per_page || 10
+        totalPages,
+        currentPage,
+        perPage
       }
     };
   } catch (error) {
-    console.error('Failed to fetch posts:', error)
-    return {
-      posts: [],
-      pagination: {
-        total: 0,
-        totalPages: 0,
-        currentPage: params.page || 1,
-        perPage: params.per_page || 10
-      }
-    }
+    console.error('Failed to fetch posts:', error);
+    return { 
+      posts: [], 
+      pagination: { 
+        total: 0, 
+        totalPages: 0, 
+        currentPage: params.page || 1, 
+        perPage: params.per_page || 10 
+      } 
+    };
   }
 }
 

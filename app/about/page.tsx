@@ -243,7 +243,7 @@ export default function AboutPage() {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Modern Framework</h3>
                       <p className="text-slate-600 dark:text-slate-300">
-                        Built with Next.js 14, leveraging App Router, React Server Components, and other cutting-edge features for optimal performance.
+                        Built with Next.js 15.2, leveraging App Router, React Server Components, and other cutting-edge features for optimal performance.
                       </p>
                     </div>
                   </div>
@@ -284,7 +284,7 @@ export default function AboutPage() {
               <div className="relative rounded-2xl overflow-hidden shadow-lg">
                 <div className="aspect-[4/3] relative">
                   <Image
-                    src="/images/nextjs-performance.svg"
+                    src="/images/result-gosite-vercel.png"
                     alt="Next.js Performance"
                     fill
                     className="object-cover p-8"

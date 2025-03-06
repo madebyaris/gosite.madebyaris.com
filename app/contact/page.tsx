@@ -53,7 +53,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-medium mb-1">Phone</h3>
-                    <p className="text-slate-600 dark:text-slate-300">+62 812 3456 7890</p>
+                    <p className="text-slate-600 dark:text-slate-300">+62 888 888 888</p>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Available Mon-Fri, 9am-5pm</p>
                   </div>
                 </div>
@@ -64,7 +64,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-medium mb-1">Email</h3>
-                    <p className="text-slate-600 dark:text-slate-300">hello@madebyaris.com</p>
+                    <p className="text-slate-600 dark:text-slate-300">arissetia.m@gmail.com</p>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">We respond within 24 hours</p>
                   </div>
                 </div>
@@ -76,8 +76,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="text-lg font-medium mb-1">Address</h3>
                     <p className="text-slate-600 dark:text-slate-300">
-                      Jl. Raya Utama No. 123<br />
-                      Jakarta Selatan, 12345<br />
+                      Sidoarjo, Jawa Timur<br />
                       Indonesia
                     </p>
                   </div>

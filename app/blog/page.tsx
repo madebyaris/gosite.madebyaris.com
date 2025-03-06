@@ -7,7 +7,11 @@ import { Suspense } from 'react'
 import { BlogContent } from '@/components/blog-content'
 import { Button } from '@/components/ui/button'
 
-export const revalidate = 3600
+// Increase revalidation time to 24 hours (86400 seconds)
+export const revalidate = 86400
+
+// Cache the blog page for better performance
+export const fetchCache = 'force-cache'
 
 // Structured Data
 const structuredData = {
